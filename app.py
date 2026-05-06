@@ -46,19 +46,17 @@ st.markdown("""
 
 st_autorefresh(interval=3000, key="data_refresh")
 
-# --- FİREBASE BAĞLANTISI (KESİN ÇÖZÜM) ---
+# --- FİREBASE BAĞLANTISI (NÜKLEER SEÇENEK) ---
 if not firebase_admin._apps:
-    if "firebase" in st.secrets:
-        # Streamlit formatını direkt sözlüğe çevir (json derdi bitti!)
-        key_dict = dict(st.secrets["firebase"])
-        # Firebase'in gıcık olduğu o satır boşluklarını düzelt
-        key_dict["private_key"] = key_dict["private_key"].replace("\\n", "\n")
+    if "firebase_gizli_anahtar" in st.secrets:
+        # Dev metni alıp json'a çeviriyoruz, hataya yer bırakmıyoruz!
+        key_dict = json.loads(st.secrets["firebase_gizli_anahtar"])
         cred = credentials.Certificate(key_dict)
     else:
-        # Kendi bilgisayarındayken dosyadan oku
         cred = credentials.Certificate("firebase_key.json")
     
     firebase_admin.initialize_app(cred)
+    db = firestore.client()
 
 # --- VERİ TABANI KONTROLLERİ ---
 oyun_ref = db.collection("oyun_odasi").document("merkez")
